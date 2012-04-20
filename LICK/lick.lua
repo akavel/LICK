@@ -23,6 +23,15 @@ function lick.load()
     last_modified = 0
 end
 
+local function dbg(s)
+    print('ERROR: ' .. tostring(err))
+    if lick.debugoutput then
+        lick.debugoutput = (lick.debugoutput .."ERROR: ".. tostring(err) .. "\n" )
+    else
+        lick.debugoutput =  'ERROR: ' .. tostring(err) .. "\n"
+    end 
+end
+
 -- load the lickcoding file and execute the contained update function
 function lick.update(dt)
     if love.filesystem.exists(lick.file) and last_modified < love.filesystem.getLastModified(lick.file) then
@@ -34,12 +43,7 @@ function lick.update(dt)
         end
         ok,err = xpcall(chunk, handle)
         if not ok then 
-            print(tostring(err))
-            if lick.debugoutput then
-                lick.debugoutput = (lick.debugoutput .."ERROR: ".. err .. "\n" )
-            else
-                lick.debugoutput =  err .. "\n"
-            end 
+            dbg(err)
         end
         if ok then 
             print("CHUNK LOADED\n")
@@ -48,24 +52,14 @@ function lick.update(dt)
         if lick.reset then
             loadok, err = xpcall(love.load, handle)
             if not loadok and not loadok_old then
-                print("ERROR: "..tostring(err))
-                if lick.debugoutput then
-                    lick.debugoutput = (lick.debugoutput .."ERROR: ".. err .. "\n" ) 
-                else
-                    lick.debugoutput =  err .. "\n" 
-                end 
+                dbg(err)
                 loadok_old = not loadok
             end
         end
     end
     updateok, err = pcall(love.update,dt)
     if not updateok and not updateok_old then 
-        print("ERROR: "..tostring(err))
-        if lick.debugoutput then
-            lick.debugoutput = (lick.debugoutput .."ERROR: ".. err .. "\n" ) 
-        else
-            lick.debugoutput =  err .. "\n" 
-        end 
+        dbg(err)
     end
     
     updateok_old = not updateok
@@ -74,12 +68,7 @@ end
 function lick.draw()
     drawok, err = xpcall(love.draw, handle)
     if not drawok and not drawok_old then 
-        print(tostring(err)) 
-        if lick.debugoutput then
-            lick.debugoutput = (lick.debugoutput .. err .. "\n" ) 
-        else
-            lick.debugoutput =  err .. "\n" 
-        end 
+        dbg(err)
     end
     if lick.debug and lick.debugoutput then 
         love.graphics.setColor(255,255,255,120)
@@ -102,7 +91,7 @@ function love.run()
             love.timer.step()
             dt = love.timer.getDelta()
         end
-       -- if love.update then love.update(dt) end -- will pass 0 if love.timer is disabled
+        -- if love.update then love.update(dt) end -- will pass 0 if love.timer is disabled
         lick.update(dt)
         if love.graphics then
             if not lick.clearFlag then 
