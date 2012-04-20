@@ -79,6 +79,9 @@ end
 
 function love.run()
 
+    math.randomseed(os.time())
+    math.random() math.random()
+
     if love.load then 
         love.load(arg) 
     end
@@ -87,6 +90,22 @@ function love.run()
 
     -- Main loop time.
     while true do
+        -- Process events.
+        if love.event then
+            love.event.pump()
+            for e,a,b,c,d in love.event.poll() do
+                if e == "quit" then
+                    if not love.quit or not love.quit() then
+                        if love.audio then
+                            love.audio.stop()
+                        end
+                        return
+                    end
+                end
+                love.handlers[e](a,b,c,d)
+            end
+        end
+
         if love.timer then
             love.timer.step()
             dt = love.timer.getDelta()
@@ -99,21 +118,6 @@ function love.run()
             end
             -- if love.draw then love.draw() end
             lick.draw()
-        end
-
-        -- Process events.
-        if love.event then
-            for e,a,b,c,d in love.event.poll() do
-                if e == "quit" then
-                    if not love.quit or not love.quit() then
-                        if love.audio then
-                            love.audio.stop()
-                        end
-                        return
-                    end
-                end
-                love.handlers[e](a,b,c,d)
-            end
         end
 
         if love.timer then 
