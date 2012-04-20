@@ -10,7 +10,7 @@ lick.debug = false
 lick.reset = false
 lick.clearFlag = false
 
-function handle(err)
+local function handle(err)
     return "ERROR: " .. err
 end
 
@@ -103,8 +103,8 @@ function love.run()
 
         -- Process events.
         if love.event then
-            for e,a,b,c in love.event.poll() do
-                if e == "q" then
+            for e,a,b,c,d in love.event.poll() do
+                if e == "quit" then
                     if not love.quit or not love.quit() then
                         if love.audio then
                             love.audio.stop()
@@ -112,12 +112,12 @@ function love.run()
                         return
                     end
                 end
-                love.handlers[e](a,b,c)
+                love.handlers[e](a,b,c,d)
             end
         end
 
         if love.timer then 
-            love.timer.sleep(1) 
+            love.timer.sleep(0.001) 
         end
         if love.graphics then 
             love.graphics.present() 
